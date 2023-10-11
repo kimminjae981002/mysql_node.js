@@ -20,6 +20,9 @@
   "homepage": "https://github.com/web-n/Nodejs#readme",
   "dependencies": {
     "init": "^0.1.2",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.6.1",
+    "nodemon": "^3.0.1",
     "sanitize-html": "^1.18.2"
   },
   "description": ""
