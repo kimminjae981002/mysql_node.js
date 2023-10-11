@@ -24,22 +24,11 @@ var app = http.createServer(function (request, response) {
   var pathname = url.parse(_url, true).pathname;
   if (pathname === "/") {
     if (queryData.id === undefined) {
-      // fs.readdir("./data", function (error, filelist) {
-      //   var title = "Welcome";
-      //   var description = "Hello, Node.js";
-      //   var list = template.list(filelist);
-      //   var html = template.HTML(
-      //     title,
-      //     list,
-      //     `<h2>${title}</h2>${description}`,
-      //     `<a href="/create">create</a>`
-      //   );
-      //   response.writeHead(200);
-      //   response.end(html);
-      // });
-
       // db.query를 사용해서 실행
       db.query(`select * from topic`, function (error, topics) {
+        if (error) {
+          throw error;
+        }
         var title = "Welcome";
         var description = "Hello, Node.js";
         var list = template.list(topics);
@@ -53,30 +42,6 @@ var app = http.createServer(function (request, response) {
         response.end(html);
       });
     } else {
-      // fs.readdir("./data", function (error, filelist) {
-      //   var filteredId = path.parse(queryData.id).base;
-      //   fs.readFile(`data/${filteredId}`, "utf8", function (err, description) {
-      //     var title = queryData.id;
-      //     var sanitizedTitle = sanitizeHtml(title);
-      //     var sanitizedDescription = sanitizeHtml(description, {
-      //       allowedTags: ["h1"],
-      //     });
-      //     var list = template.list(filelist);
-      //     var html = template.HTML(
-      //       sanitizedTitle,
-      //       list,
-      //       `<h2>${sanitizedTitle}</h2>${sanitizedDescription}`,
-      //       ` <a href="/create">create</a>
-      //           <a href="/update?id=${sanitizedTitle}">update</a>
-      //           <form action="delete_process" method="post">
-      //             <input type="hidden" name="id" value="${sanitizedTitle}">
-      //             <input type="submit" value="delete">
-      //           </form>`
-      //     );
-      //     response.writeHead(200);
-      //     response.end(html);
-      //   });
-      // });
       db.query(`select * from topic`, function (error, topics) {
         if (error) {
           throw error;
@@ -84,6 +49,7 @@ var app = http.createServer(function (request, response) {
         db.query(
           `select * from topic where id=?`,
           [queryData.id],
+          // topic을 id하나씩 [quertData.id]와 같은 것만 나오게
           // 공격할 수 있기 때문에 이렇게 처리
           function (error2, topic) {
             if (error2) {
@@ -96,7 +62,8 @@ var app = http.createServer(function (request, response) {
             var html = template.HTML(
               title,
               list,
-              `<h2>${title}</h2>${description},
+              `<h2>${title}</h2>${description}`,
+              `
               <a href="/create">create</a>   
                <a href="/update?id=${queryData.id}">update</a>
               <form action="delete_process" method="post">
@@ -106,7 +73,6 @@ var app = http.createServer(function (request, response) {
               `,
               ""
             );
-
             response.writeHead(200);
             response.end(html);
           }
